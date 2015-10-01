@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <title>Trabalho de AD</title>
     <script type="text/javascript" src="interface.js"></script>
+    <script type="text/javascript" src="ChartJS/Chart.js"></script>
 </head>
+<body onload="chart()">
 <p >
 <h1><b>Trabalho de Avaliação de Desempenho</b></h1>
 <p>&lambda;: <input id="lambda" type="text"></p>
@@ -20,6 +22,12 @@
     <p id="uniformValues"></p>
 </p>
 <p><button>Go!</button></p>
+
+<div style="width:30%">
+    <div>
+        <canvas id="canvas" height="450" width="600"></canvas>
+    </div>
+</div>
 
 </body>
 </html>
