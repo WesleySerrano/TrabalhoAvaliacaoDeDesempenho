@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trabalho de AD</title>
+    <script type="text/javascript" src="interface.js"></script>
+</head>
+<p >
+<h1><b>Trabalho de Avaliação de Desempenho</b></h1>
+<p>&lambda;: <input id="lambda" type="text"></p>
+<p>&mu;: <input id="mu" type="text"> </p>
+<p>p: <input id="p" type="text"> </p>
+<p>
+    Distribuição:
+    <select id="distrib" onchange="onDistributionValueChanged()">
+        <option value="poisson">Poisson</option>
+        <option value="deterministico">Determinístico</option>
+        <option value="uniforme">Uniforme</option>
+    </select>
+    <p id="uniformValues"></p>
+</p>
+<p><button>Go!</button></p>
+
+</body>
+</html>
