@@ -4,14 +4,17 @@
     <meta charset="UTF-8">
     <title>Trabalho de AD</title>
     <script type="text/javascript" src="interface.js"></script>
+    <script type="text/javascript" src="Random.js"></script>
+    <script type="text/javascript" src="Queue.js"></script>
     <script type="text/javascript" src="ChartJS/Chart.js"></script>
 </head>
-<body onload="chart()">
+<body id = "body">
 <p >
 <h1><b>Trabalho de Avaliação de Desempenho</b></h1>
 <p>&lambda;: <input id="lambda" type="text"></p>
 <p>&mu;: <input id="mu" type="text"> </p>
 <p>p: <input id="p" type="text"> </p>
+<p>Tempo de simulação: <input id="time" type="text"> </p>
 <p>
     Distribuição:
     <select id="distrib" onchange="onDistributionValueChanged()">
@@ -21,13 +24,10 @@
     </select>
     <p id="uniformValues"></p>
 </p>
-<p><button>Go!</button></p>
+<p><button onclick="simulate()">Go!</button></p>
 
-<div style="width:30%">
-    <div>
-        <canvas id="canvas" height="450" width="600"></canvas>
-    </div>
-</div>
+<p id="result"></p>
+<p id="chart"></p>
 
 </body>
 </html>
