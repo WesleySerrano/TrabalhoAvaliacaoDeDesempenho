@@ -43,7 +43,7 @@ function chart(chartLabels, chartsData)
         labels : chartLabels,
         datasets : [
             {
-                label: "Número médio de clientes no sistema - Simulado",
+                label: "E[#clientes no sistema] - Simulado",
                 fillColor : "rgba(220,220,220,0.2)",
                 strokeColor : "rgba(220,220,220,1)",
                 pointColor : "rgba(220,220,220,1)",
@@ -53,7 +53,7 @@ function chart(chartLabels, chartsData)
                 data : chartsData[0]
             },
             {
-                label: "Número médio de clientes no sistema -  Analítico",
+                label: "E[#clientes no sistema] -  Analitico",
                 fillColor : "rgba(151,187,205,0.2)",
                 strokeColor : "rgba(151,187,205,1)",
                 pointColor : "rgba(151,187,205,1)",
@@ -68,7 +68,8 @@ function chart(chartLabels, chartsData)
 
     var ctx = document.getElementById("canvas").getContext("2d");
     window.myLine = new Chart(ctx).Line(lineChartData, {
-        responsive: true
+        responsive: true,
+        multiTooltipTemplate: "<%= datasetLabel %> - <%= value %>"
     });
 }
 
