@@ -11,8 +11,16 @@
 <body id = "body">
 <p >
 <h1><b>Trabalho de Avaliação de Desempenho</b></h1>
-<p>&lambda;: <input id="lambda" type="text"></p>
-<p>&mu;: <input id="mu" type="text"> </p>
+<p>&lambda; mínimo: <input id="lambda" type="text"></p>
+<p>&mu; mínimo: <input id="mu" type="text"> </p>
+
+<form action="form_action.asp">
+    Qual dos parâmetros gostaria de variar:<br>
+    <input type="radio" name="parameter" checked="true" value="lambda">&lambda;<br>
+    <input type="radio" name="parameter" value="mu">&mu;<br>
+    <br>
+</form>
+
 <p>p: <input id="p" type="text"> </p>
 <p>Tempo de simulação: <input id="time" type="text"> </p>
 <p>
@@ -26,8 +34,8 @@
 </p>
 <p><button onclick="simulate()">Go!</button></p>
 
-<p id="result"></p>
 <p id="chart"></p>
+<p id="results"></p>
 
 </body>
 </html>

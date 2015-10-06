@@ -19,6 +19,24 @@ function onDistributionValueChanged()
     }
 }
 
+function addResultTable(lambda, mu, personsOnQueue, meanServiceTime, meanPersonsOnSystem, meanWait, meanTimeOnSystem, utilisation)
+{
+  var result = "<table border='1'>";
+
+    result+="<tr><td>&lambda;</td><td>"+lambda+"</td></tr>";
+    result+="<tr><td>&mu;</td><td>"+mu+"</td></tr>";
+    result+="<tr><td>Total de pessoas na fila</td><td>"+personsOnQueue+"</td></tr>";
+    result+="<tr><td>Tempo m&eacutedio de servi&ccedilo</td><td>"+meanServiceTime+"</td></tr>";
+    result+="<tr><td>M&eacutedia de pessoas na fila</td><td>"+meanPersonsOnSystem+"</td></tr>";
+    result+="<tr><td>Tempo m&eacutedio de espera</td><td>"+meanWait+"</td></tr>";
+    result+="<tr><td>Tempo m&eacutedio no sistema</td><td>"+meanTimeOnSystem+"</td></tr>";
+    result+="<tr><td>Utiliza&ccedil&atildeo do sistema</td><td>"+(utilisation*100)+"%</td></tr>";
+
+    result += "</table><br>";
+
+    document.getElementById("results").innerHTML += result;
+}
+
 function chart(chartLabels, chartsData)
 {
     var lineChartData = {

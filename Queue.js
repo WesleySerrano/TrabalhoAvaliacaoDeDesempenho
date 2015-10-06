@@ -61,11 +61,21 @@ function simulate()
 {
     chartLabels = [];
     chartsValues = [[],[]];
+    var parameters = document.forms[0];
 
     var lambda = Number(document.getElementById("lambda").value);
     var mu = Number(document.getElementById("mu").value);
 
-    for(;lambda < 0.9; lambda += 0.05) runQueue(lambda,mu);
+    document.getElementById("results").innerHTML = "";
+
+    if(parameters[0].checked)
+    {
+        for(;lambda < 0.9; lambda += 0.05) runQueue(lambda,mu,true);
+    }
+    else if(parameters[1].checked)
+    {
+        for(;mu < 10.0; mu += 0.5) runQueue(lambda,mu,false);
+    }
 }
 
 function runQueue()
@@ -76,9 +86,20 @@ function runQueue()
     {
         lambda = arguments[0];
         mu = arguments[1];
+        var varyingLambda = arguments[2];
+
+        if(varyingLambda) chartLabels.push(""+lambda);
+        else  chartLabels.push(""+mu);
     }
 
-    chartLabels.push(""+lambda);
+    var distributionBox = document.getElementById("distrib");
+    var distribution = distributionBox.options[distributionBox.selectedIndex].text;
+    var uniformLow,uniformHigh;
+    if(distribution === "Uniforme")
+    {
+        uniformLow = Number(document.getElementById("uniformLow").value);
+        uniformHigh = Number(document.getElementById("uniformHigh").value);
+    }
 
     var p = Number(document.getElementById("p").value);
     var simulationTime = Number(document.getElementById("time").value);
@@ -98,13 +119,40 @@ function runQueue()
     {
         if (simulationQueue.numberOfPersonsOnQueue() === 0)
         {
-            arrivalTime = randomNumbersGenerator.exponential(lambda);
+            if(distribution === "Uniforme")
+            {
+                arrivalTime = randomNumbersGenerator.uniform(uniformLow,uniformHigh)
+            }
+
+            else if(distribution === "Poisson")
+            {
+                arrivalTime = randomNumbersGenerator.exponential(lambda);
+            }
+
+            else if(distribution === "Determinístico")
+            {
+                arrivalTime = lambda;
+            }
+
             serviceStartTime = arrivalTime;
             currentPersonsOnQueue.push(1);
         }
         else
         {
-            arrivalTime+=randomNumbersGenerator.exponential(lambda);
+            if(distribution === "Uniforme")
+            {
+                arrivalTime += randomNumbersGenerator.uniform(uniformLow,uniformHigh)
+            }
+
+            else if(distribution === "Poisson")
+            {
+                arrivalTime += randomNumbersGenerator.exponential(lambda);
+            }
+
+            else if(distribution === "Determinístico")
+            {
+                arrivalTime += lambda;
+            }
             serviceStartTime=Math.max(arrivalTime,simulationQueue.last().serviceEndTime);
 
             var totalPersonsOnQueue = simulationQueue.personsOnQueue();
@@ -122,7 +170,6 @@ function runQueue()
         simulationQueue.push(queueArrival(arrivalTime,serviceStartTime,serviceTimeLength));
 
         currentTime = arrivalTime;
-        //document.getElementById("result").innerHTML = currentTime;
     }
 
     var waitTimes = new Array();
@@ -162,7 +209,7 @@ function runQueue()
         meanPersonsOnSystem += currentPersonsOnQueue[i]/currentPersonsOnQueue.length;
     }
 
-    var utilisation = (meanServiceTime*serviceTimes.length)/currentTime;
+    var utilisation = lambda/mu;
 
     var result = "Persons on Queue: "+ simulationQueue.numberOfPersonsOnQueue() + "<br>";
     result += "Mean service time: "+ meanServiceTime + "<br>";
@@ -172,9 +219,22 @@ function runQueue()
     result += "Utilisation : "+ utilisation + "<br>";
 
     chartsValues[0].push(meanPersonsOnSystem);
-    chartsValues[1].push(littlesLaw(lambda,mu));
+    if(distribution === "Uniforme")
+    {
+        chartsValues[1].push((uniformHigh+uniformLow)/2.0);
+    }
 
-    document.getElementById("result").innerHTML = result;
+    else if(distribution === "Poisson")
+    {
+        chartsValues[1].push(littlesLaw(lambda,mu));
+    }
 
+    else if(distribution === "Determinístico")
+    {
+        chartsValues[1].push(lambda);
+    }
+
+    //document.getElementById("result").innerHTML = result;
+    addResultTable(lambda,mu,simulationQueue.numberOfPersonsOnQueue(),meanServiceTime,meanPersonsOnSystem,meanWait,meanTimeOnSystem,utilisation);
     addChart(chartLabels,chartsValues);
 }
