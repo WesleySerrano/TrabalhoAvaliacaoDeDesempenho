@@ -37,47 +37,68 @@ function addResultTable(lambda, mu, personsOnQueue, meanServiceTime, meanPersons
     document.getElementById("results").innerHTML += result;
 }
 
-function chart(chartLabels, chartsData)
+function chart(chartLabels, chartsData, xLabel)
 {
-    var lineChartData = {
-        labels : chartLabels,
-        datasets : [
-            {
-                label: "E[#clientes no sistema] - Simulado",
-                fillColor : "rgba(220,220,220,0.2)",
-                strokeColor : "rgba(220,220,220,1)",
-                pointColor : "rgba(220,220,220,1)",
-                pointStrokeColor : "#fff",
-                pointHighlightFill : "#fff",
-                pointHighlightStroke : "rgba(220,220,220,1)",
-                data : chartsData[0]
+    $('#container').highcharts({
+        chart: {
+            type: 'area'
+        },
+        title: {
+            text: '<b>Numero medio de pessoas na fila</b>'
+        },
+        subtitle: {
+            text: ''
+        },
+        xAxis: {
+            allowDecimals: false,
+            categories: chartLabels,
+            title: {
+                text: '<b>'+xLabel+'</b>'
             },
-            {
-                label: "E[#clientes no sistema] -  Analitico",
-                fillColor : "rgba(151,187,205,0.2)",
-                strokeColor : "rgba(151,187,205,1)",
-                pointColor : "rgba(151,187,205,1)",
-                pointStrokeColor : "#fff",
-                pointHighlightFill : "#fff",
-                pointHighlightStroke : "rgba(151,187,205,1)",
-                data : chartsData[1]
+            labels: {
+                formatter: function () {
+                    return this.value; // clean, unformatted number for year
+                }
             }
-        ]
-
-    }
-
-    var ctx = document.getElementById("canvas").getContext("2d");
-    window.myLine = new Chart(ctx).Line(lineChartData, {
-        responsive: true,
-        multiTooltipTemplate: "<%= datasetLabel %> - <%= value %>"
+        },
+        yAxis: {
+            title: {
+                text: '<b>Media de pessoas na fila</b>'
+            },
+            labels: {
+                formatter: function () {
+                    return this.value ;
+                }
+            }
+        },
+        tooltip: {
+            pointFormat: '<b>{series.name}: </b>{point.y}'
+        },
+        plotOptions: {
+            area: {
+                marker: {
+                    enabled: false,
+                    symbol: 'circle',
+                    radius: 2,
+                    states: {
+                        hover: {
+                            enabled: true
+                        }
+                    }
+                }
+            }
+        },
+        series: [{
+            name: 'Simulado',
+            data: chartsData[0]
+        }, {
+            name: 'Analitico',
+            data: chartsData[1]
+        }]
     });
-}
+};
 
-function addChart(chartLabels,chartsValues)
+function addChart(chartLabels,chartsValues, xLabel)
 {
-    var insertChartString = "<div style = \"width:30%\"> <div> <canvas id=\"canvas\" height=\"600\" width=\"800\"></canvas> </div> </div>";
-
-    document.getElementById("chart").innerHTML = insertChartString;
-
-    chart(chartLabels,chartsValues);
+    chart(chartLabels,chartsValues, xLabel);
 }

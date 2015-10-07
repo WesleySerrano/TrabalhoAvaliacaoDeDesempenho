@@ -6,7 +6,9 @@
     <script type="text/javascript" src="interface.js"></script>
     <script type="text/javascript" src="Random.js"></script>
     <script type="text/javascript" src="Queue.js"></script>
-    <script type="text/javascript" src="ChartJS/Chart.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script type="text/javascript" src="Highcharts/js/highcharts.js"></script>
+    <script src="Highcharts/js/modules/exporting.js"></script>
 </head>
 <body id = "body">
 <p >
@@ -24,7 +26,7 @@
 <p>p: <input id="p" type="text"> </p>
 <p>Tempo de simulação: <input id="time" type="text"> </p>
 <p>
-    Distribuição:
+    Distribuição do tempo entre chegadas:
     <select id="distrib" onchange="onDistributionValueChanged()">
         <option value="poisson">Poisson</option>
         <option value="deterministico">Determinístico</option>
@@ -34,7 +36,7 @@
 </p>
 <p><button onclick="simulate()">Go!</button></p>
 
-<p id="chart"></p>
+<div id="container" style="min-width: 600px; height: 800px; margin: 0 auto"></div>
 <p id="results"></p>
 
 </body>

@@ -70,17 +70,18 @@ function simulate()
 
     if(parameters[0].checked)
     {
-        for(;lambda < 0.9; lambda += 0.05) runQueue(lambda,mu,true);
+        for(;lambda <= 0.9; lambda += 0.05) runQueue(lambda,mu,true);
     }
     else if(parameters[1].checked)
     {
-        for(;mu < 10.0; mu += 0.5) runQueue(lambda,mu,false);
+        for(;mu <= 10.0; mu += 0.5) runQueue(lambda,mu,false);
     }
 }
 
 function runQueue()
 {
     var lambda, mu;
+    var chartXLabel;
 
     if(arguments.length > 0)
     {
@@ -88,8 +89,16 @@ function runQueue()
         mu = arguments[1];
         var varyingLambda = arguments[2];
 
-        if(varyingLambda) chartLabels.push(""+lambda);
-        else  chartLabels.push(""+mu);
+        if(varyingLambda)
+        {
+            chartLabels.push(""+lambda);
+            chartXLabel = "Lambda";
+        }
+        else
+        {
+            chartLabels.push(""+mu);
+            chartXLabel = "u;";
+        }
     }
 
     var distributionBox = document.getElementById("distrib");
@@ -234,7 +243,6 @@ function runQueue()
         chartsValues[1].push(lambda);
     }
 
-    //document.getElementById("result").innerHTML = result;
     addResultTable(lambda,mu,simulationQueue.numberOfPersonsOnQueue(),meanServiceTime,meanPersonsOnSystem,meanWait,meanTimeOnSystem,utilisation);
-    addChart(chartLabels,chartsValues);
+    addChart(chartLabels,chartsValues,chartXLabel);
 }
