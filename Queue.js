@@ -97,7 +97,7 @@ function runQueue()
         else
         {
             chartLabels.push(""+mu);
-            chartXLabel = "u;";
+            chartXLabel = "u";
         }
     }
 
