@@ -14,13 +14,6 @@ function queue()
         this.array.push(newElement);
     }
 
-    this.pop = function()
-    {
-        var served = this.array[0];
-        this.array.splice(0,1);
-        return served;
-    }
-
     this.last = function()
     {
         return this.array[this.array.length-1];
@@ -110,7 +103,8 @@ function runQueue()
         uniformHigh = Number(document.getElementById("uniformHigh").value);
     }
 
-    var p = Number(document.getElementById("p").value);
+    /*var p = Number(document.getElementById("p").value);
+    * */
     var simulationTime = Number(document.getElementById("time").value);
 
     var randomNumbersGenerator = new Random();
@@ -133,7 +127,7 @@ function runQueue()
                 arrivalTime = randomNumbersGenerator.uniform(uniformLow,uniformHigh)
             }
 
-            else if(distribution === "Poisson")
+            else if(distribution === "Exponencial")
             {
                 arrivalTime = randomNumbersGenerator.exponential(lambda);
             }
@@ -153,7 +147,7 @@ function runQueue()
                 arrivalTime += randomNumbersGenerator.uniform(uniformLow,uniformHigh)
             }
 
-            else if(distribution === "Poisson")
+            else if(distribution === "Exponencial")
             {
                 arrivalTime += randomNumbersGenerator.exponential(lambda);
             }
@@ -233,7 +227,7 @@ function runQueue()
         chartsValues[1].push((uniformHigh+uniformLow)/2.0);
     }
 
-    else if(distribution === "Poisson")
+    else if(distribution === "Exponencial")
     {
         chartsValues[1].push(littlesLaw(lambda,mu));
     }

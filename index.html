@@ -12,9 +12,12 @@
 </head>
 <body id = "body">
 <p >
-<h1><b>Trabalho de Avaliação de Desempenho</b></h1>
-<p>&lambda; mínimo: <input id="lambda" type="text"></p>
-<p>&mu; mínimo: <input id="mu" type="text"> </p>
+<h1><b>Simulador de fila M/M/1</b></h1>
+<table>
+    <tr>
+        <td>
+<p>&lambda; (taxa de chegada) mínimo: <input id="lambda" type="text"></p>
+<p>&mu; (taxa de servi&ccedilo) mínimo: <input id="mu" type="text"> </p>
 
 <form action="form_action.asp">
     Qual dos parâmetros gostaria de variar:<br>
@@ -23,18 +26,23 @@
     <br>
 </form>
 
-<p>p: <input id="p" type="text"> </p>
+<!-- <p>p: <input id="p" type="text"> </p>
+ -->
 <p>Tempo de simulação: <input id="time" type="text"> </p>
 <p>
     Distribuição do tempo entre chegadas:
     <select id="distrib" onchange="onDistributionValueChanged()">
-        <option value="poisson">Poisson</option>
-        <option value="deterministico">Determinístico</option>
-        <option value="uniforme">Uniforme</option>
+        <option value="exponencial">Exponencial</option>
+        <!--<option value="deterministico">Determinístico</option>
+        <option value="uniforme">Uniforme</option>-->
     </select>
     <p id="uniformValues"></p>
 </p>
 <p><button onclick="simulate()">Go!</button></p>
+        </td>
+        <td><img src="Imagens/fila.jpg" alt="Ilustra&ccedil;&atilde;o de uma fila M/M/1"></td>
+    </tr>
+</table>
 
 <div id="container" style="min-width: 600px; height: 800px; margin: 0 auto"></div>
 <p id="results"></p>

@@ -96,7 +96,7 @@ function chart(chartLabels, chartsData, xLabel)
             data: chartsData[1]
         }]
     });
-};
+}
 
 function addChart(chartLabels,chartsValues, xLabel)
 {
