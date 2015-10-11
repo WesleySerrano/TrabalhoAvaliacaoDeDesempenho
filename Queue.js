@@ -214,12 +214,12 @@ function runQueue()
 
     var utilisation = lambda/mu;
 
-    var result = "Persons on Queue: "+ simulationQueue.numberOfPersonsOnQueue() + "<br>";
-    result += "Mean service time: "+ meanServiceTime + "<br>";
-    result += "Mean persons on system: "+ meanPersonsOnSystem + "<br>";
-    result += "Mean wait time: "+ meanWait + "<br>";
-    result += "Mean time on system: "+ meanTimeOnSystem + "<br>";
-    result += "Utilisation : "+ utilisation + "<br>";
+    var result = "Total de pessoas na fila: "+ simulationQueue.numberOfPersonsOnQueue() + "<br>";
+    result += "Tempo m&eacute;dio de na fila: "+ meanServiceTime + "<br>";
+    result += "Numero m&eacutedio de pessoas na fila"+ meanPersonsOnSystem + "<br>";
+    result += "Tempo m&eacute;dio de espera: "+ meanWait + "<br>";
+    result += "Tempo m&eacute;dio no sistema: "+ meanTimeOnSystem + "<br>";
+    result += "Utilisa&ccedil;&atilde;o : "+ utilisation + "<br>";
 
     chartsValues[0].push(meanPersonsOnSystem);
     if(distribution === "Uniforme")
