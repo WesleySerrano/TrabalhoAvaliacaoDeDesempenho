@@ -19,19 +19,19 @@ function onDistributionValueChanged()
     }
 }
 
-function addResultTable(lambda, mu, personsOnQueue, meanServiceTime, meanPersonsOnSystem, meanWait, meanTimeOnSystem, utilisation,personsOnSystemStardadDeviation)
+function addResultTable(lambda, mu, personsServed, analyticMeanPersonsOnSystem, meanPersonsOnSystem, confidenceIntervalUpperLimit, confidenceIntervalLowerLimit, analyticUtilisation,personsOnSystemStandardDeviation)
 {
   var result = "<table border='1'>";
 
     result+="<tr><td>&lambda;</td><td>"+lambda+"</td></tr>";
     result+="<tr><td>&mu;</td><td>"+mu+"</td></tr>";
-    result+="<tr><td>Total de pessoas na fila</td><td>"+personsOnQueue+"</td></tr>";
-    result+="<tr><td>Tempo m&eacutedio de servi&ccedilo</td><td>"+meanServiceTime+"</td></tr>";
-    result+="<tr><td>M&eacutedia de pessoas na fila</td><td>"+meanPersonsOnSystem+"</td></tr>";
-    result+="<tr><td>Tempo m&eacutedio de espera</td><td>"+meanWait+"</td></tr>";
-    result+="<tr><td>Tempo m&eacutedio no sistema</td><td>"+meanTimeOnSystem+"</td></tr>";
-    result+="<tr><td>Utiliza&ccedil&atildeo do sistema</td><td>"+(utilisation*100)+"%</td></tr>";
-    result+="<tr><td>Desvio Padr&atildeo (Pessoas no sistema)</td><td>"+personsOnSystemStardadDeviation+"</td></tr>";
+    result+="<tr><td>Total de pessoas atendidas</td><td>"+personsServed+"</td></tr>";
+    result+="<tr><td>M&eacutedia de pessoas na fila (Anal&iacute;tico)</td><td>"+analyticMeanPersonsOnSystem+"</td></tr>";
+    result+="<tr><td>M&eacutedia de pessoas na fila (Simulado)</td><td>"+meanPersonsOnSystem+"</td></tr>";
+    result+="<tr><td>Intervalo de Confian&ccedil;a (Limite Superior)</td><td>"+confidenceIntervalUpperLimit+"</td></tr>";
+    result+="<tr><td>Intervalo de Confian&ccedil;a (Limite Inferior)</td><td>"+confidenceIntervalLowerLimit+"</td></tr>";
+    result+="<tr><td>Desvio Padr&atildeo (Pessoas no sistema)</td><td>"+personsOnSystemStandardDeviation+"</td></tr>";
+    result+="<tr><td>Utiliza&ccedil&atildeo do sistema (Anal&iacute;tico)</td><td>"+(analyticUtilisation*100)+"%</td></tr>";
 
     result += "</table><br>";
 
@@ -42,7 +42,7 @@ function chart(chartLabels, chartsData, xLabel)
 {
     $('#container').highcharts({
         title: {
-            text: '<b>Numero medio de pessoas na fila</b>'
+            text: '<b>N\xFAmero m\xE9dio de pessoas na fila</b>'
         },
         subtitle: {
             text: ''
@@ -61,7 +61,7 @@ function chart(chartLabels, chartsData, xLabel)
         },
         yAxis: {
             title: {
-                text: '<b>Media de pessoas na fila</b>'
+                text: '<b>M\xE9dia de pessoas na fila</b>'
             },
             labels: {
                 formatter: function () {
@@ -70,7 +70,9 @@ function chart(chartLabels, chartsData, xLabel)
             }
         },
         tooltip: {
-            pointFormat: '<b>{series.name}: </b>{point.y}'
+            pointFormat: '<b>{series.name}: </b>{point.y}<br>',
+            crosshairs: true,
+            shared: true
         },
         plotOptions: {
             area: {
@@ -84,23 +86,24 @@ function chart(chartLabels, chartsData, xLabel)
                         }
                     }
                 }
-            }
+            },
+
         },
         series: [{
             name: 'Simulado',
             data: chartsData[0]
         }, {
-            name: 'Analitico',
+            name: 'Anal\xEDtico',
             color: 'rgba(255, 0, 0, .5)',
             data: chartsData[1]
         }, {
-            name: ' Inf Intervalo de confianca (95%)',
-            type: 'scatter',
+            name: ' Inf Intervalo de confian\xE7a (95%)',
+            dashStyle: 'shortdot',
             color: 'rgba(0, 0, 0, .5)',
             data: chartsData[2]
         }, {
-            name: 'Sup Intervalo de confianca (95%)',
-            type: 'scatter',
+            name: 'Sup Intervalo de confian\xE7a (95%)',
+            dashStyle: 'shortdot',
             color: 'rgba(0, 0, 0, .5)',
             data: chartsData[3]
         }]

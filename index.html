@@ -1,13 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 <head>
-    <meta charset="UTF-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <title>Trabalho de AD</title>
     <script type="text/javascript" src="interface.js"></script>
     <script type="text/javascript" src="Random.js"></script>
     <script type="text/javascript" src="Queue.js"></script>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script type="text/javascript" src="Highcharts/js/highcharts.js"></script>
+
+    <script src="http://www.highcharts.com/joomla/media/com_demo/js/highslide-full.min.js"></script>
+    <script src="http://www.highcharts.com/joomla/media/com_demo/js/highslide.config.js" charset="utf-8"></script>
+    <link rel="stylesheet" type="text/css" href="http://www.highcharts.com/joomla/media/com_demo/highslide.css" />
     <script src="Highcharts/js/modules/exporting.js"></script>
 </head>
 <body id = "body">
@@ -17,7 +21,7 @@
     <tr>
         <td>
 <p>&lambda; (taxa de chegada) mínimo: <input id="lambda" type="text" value="0.1"></p>
-<p>&mu; (taxa de servi&ccedilo) mínimo: <input id="mu" type="text" value="1"> </p>
+<p>&mu; (taxa de servi&ccedilo) mínimo: <input id="mu" type="text" value="3"> </p>
 
 <form action="form_action.asp">
     Qual dos parâmetros gostaria de variar:<br>
@@ -28,7 +32,7 @@
 
 <!-- <p>p: <input id="p" type="text"> </p>
  -->
-<p>Tempo de simulação: <input id="time" type="text" value="1000"> </p>
+<p>Tempo de simulação: <input id="time" type="text" value="100000"> </p>
 <p>
     Distribuição do tempo entre chegadas:
     <select id="distrib" onchange="onDistributionValueChanged()">

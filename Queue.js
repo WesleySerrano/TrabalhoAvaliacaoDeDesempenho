@@ -13,29 +13,29 @@ function Queue()
     {
         this.array.push(newElement);
         this.array.sort(function(a, b){return a.eventStartTime- b.eventStartTime});
-    }
+    };
 
     this.pop = function()
     {
         var served = this.array[0];
         this.array.splice(0,1);
         return served;
-    }
+    };
 
     this.last = function()
     {
         return this.array[this.array.length-1];
-    }
+    };
 
     this.numberOfPersonsOnQueue = function()
     {
         return this.array.length;
-    }
+    };
 
     this.personsOnQueue = function()
     {
         return this.array;
-    }
+    };
 
     this.emptyQueue = function()
     {
@@ -73,7 +73,11 @@ function simulate()
 
     if(parameters[0].checked)
     {
-        for(;lambda <= 0.9; lambda += 0.05) runQueue(lambda,mu,true);
+        for(;lambda <= 0.9; lambda += 0.05)
+        {
+            lambda = Math.round(lambda * 10000) / 10000;
+            runQueue(lambda,mu,true);
+        }
     }
     else if(parameters[1].checked)
     {
@@ -105,12 +109,12 @@ function runQueue()
         if(varyingLambda)
         {
             chartLabels.push(""+lambda);
-            chartXLabel = "Lambda";
+            chartXLabel = "\u03BB";
         }
         else
         {
             chartLabels.push(""+mu);
-            chartXLabel = "u";
+            chartXLabel = "\u03BC";
         }
     }
 
@@ -123,8 +127,6 @@ function runQueue()
         uniformHigh = Number(document.getElementById("uniformHigh").value);
     }
 
-    /*var p = Number(document.getElementById("p").value);
-    * */
     var simulationTotalTime = Number(document.getElementById("time").value);
 
     var randomNumbersGenerator = new Random();
@@ -178,25 +180,27 @@ function runQueue()
             }
         }
         if(personsCounter > 0)currentPersonsOnQueue.push(personsCounter);
-        //document.getElementById("debug").innerHTML += ", "+(simulationTime);
     }
 
     var meanPersonsOnSystem = areaUnderPersonsChart/simulationTime;
 
-    var utilisation = lambda/mu;
+    var analyticUtilisation = lambda/mu;
 
     var personsOnSystemVariance = 0;
 
     for(var i = 0; i < currentPersonsOnQueue.length; i++)
     {
-        personsOnSystemVariance += Math.pow(currentPersonsOnQueue[i]-meanPersonsOnSystem,2)/currentPersonsOnQueue.length;
+        personsOnSystemVariance += Math.pow(currentPersonsOnQueue[i]-meanPersonsOnSystem,2)/(currentPersonsOnQueue.length-1);
     }
 
-    var personsOnSystemStardadDeviation = Math.sqrt(personsOnSystemVariance);
+    var personsOnSystemStandardDeviation = Math.sqrt(personsOnSystemVariance);
 
-    var confidenceIntervalEndPoints = confidenceInterval(personsOnSystemStardadDeviation,meanPersonsOnSystem,currentPersonsOnQueue.length);
+    var confidenceIntervalEndPoints = confidenceInterval(personsOnSystemStandardDeviation,meanPersonsOnSystem,currentPersonsOnQueue.length);
+
+    var analyticMeanPersonsOnSystem = littlesLaw(lambda,mu);
 
     chartsValues[0].push(meanPersonsOnSystem);
+
     if(distribution === "Uniforme")
     {
         chartsValues[1].push((uniformHigh+uniformLow)/2.0);
@@ -204,7 +208,7 @@ function runQueue()
 
     else if(distribution === "Exponencial")
     {
-        chartsValues[1].push(littlesLaw(lambda,mu));
+        chartsValues[1].push(analyticMeanPersonsOnSystem);
     }
 
     else if(distribution === "Determinístico")
@@ -215,6 +219,6 @@ function runQueue()
     chartsValues[2].push(confidenceIntervalEndPoints.lowEndPoint);
     chartsValues[3].push(confidenceIntervalEndPoints.highEndPoint);
 
-    //addResultTable(lambda,mu,simulationQueue.numberOfPersonsOnQueue(),meanServiceTime,meanPersonsOnSystem,meanWait,meanTimeOnSystem,utilisation,personsOnSystemStardadDeviation);
+    addResultTable(lambda,mu,personsServed,analyticMeanPersonsOnSystem,meanPersonsOnSystem,confidenceIntervalEndPoints.highEndPoint,confidenceIntervalEndPoints.lowEndPoint,analyticUtilisation,personsOnSystemStandardDeviation);
     addChart(chartLabels,chartsValues,chartXLabel);
 }
