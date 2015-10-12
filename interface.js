@@ -19,7 +19,7 @@ function onDistributionValueChanged()
     }
 }
 
-function addResultTable(lambda, mu, personsOnQueue, meanServiceTime, meanPersonsOnSystem, meanWait, meanTimeOnSystem, utilisation)
+function addResultTable(lambda, mu, personsOnQueue, meanServiceTime, meanPersonsOnSystem, meanWait, meanTimeOnSystem, utilisation,personsOnSystemStardadDeviation)
 {
   var result = "<table border='1'>";
 
@@ -31,6 +31,7 @@ function addResultTable(lambda, mu, personsOnQueue, meanServiceTime, meanPersons
     result+="<tr><td>Tempo m&eacutedio de espera</td><td>"+meanWait+"</td></tr>";
     result+="<tr><td>Tempo m&eacutedio no sistema</td><td>"+meanTimeOnSystem+"</td></tr>";
     result+="<tr><td>Utiliza&ccedil&atildeo do sistema</td><td>"+(utilisation*100)+"%</td></tr>";
+    result+="<tr><td>Desvio Padr&atildeo (Pessoas no sistema)</td><td>"+personsOnSystemStardadDeviation+"</td></tr>";
 
     result += "</table><br>";
 
@@ -40,9 +41,6 @@ function addResultTable(lambda, mu, personsOnQueue, meanServiceTime, meanPersons
 function chart(chartLabels, chartsData, xLabel)
 {
     $('#container').highcharts({
-        chart: {
-            type: 'area'
-        },
         title: {
             text: '<b>Numero medio de pessoas na fila</b>'
         },
@@ -93,7 +91,18 @@ function chart(chartLabels, chartsData, xLabel)
             data: chartsData[0]
         }, {
             name: 'Analitico',
+            color: 'rgba(255, 0, 0, .5)',
             data: chartsData[1]
+        }, {
+            name: ' Inf Intervalo de confianca (95%)',
+            type: 'scatter',
+            color: 'rgba(0, 0, 0, .5)',
+            data: chartsData[2]
+        }, {
+            name: 'Sup Intervalo de confianca (95%)',
+            type: 'scatter',
+            color: 'rgba(0, 0, 0, .5)',
+            data: chartsData[3]
         }]
     });
 }

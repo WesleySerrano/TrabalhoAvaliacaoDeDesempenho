@@ -3,15 +3,23 @@
  */
 
 var chartLabels = [];
-var chartsValues = [[],[]];
+var chartsValues = [[],[],[],[]];
 
-function queue()
+function Queue()
 {
-    this.array = new Array();
+    this.array = [];
 
     this.push = function(newElement)
     {
         this.array.push(newElement);
+        this.array.sort(function(a, b){return a.eventStartTime- b.eventStartTime});
+    }
+
+    this.pop = function()
+    {
+        var served = this.array[0];
+        this.array.splice(0,1);
+        return served;
     }
 
     this.last = function()
@@ -28,17 +36,19 @@ function queue()
     {
         return this.array;
     }
+
+    this.emptyQueue = function()
+    {
+        return (this.array.length === 0);
+    }
 }
 
-function queueArrival(_arrivalTime, _serviceStartTime, _serviceTimeLength)
+function QueueArrival(_type,_eventStartTime)
 {
-    var arrival = {arrivalTime:0, serviceStartTime:0, serviceTimeLength:0, serviceEndTime: 0,  waitTime: 0};
+    var arrival = {type:"", eventStartTime:0};
 
-    arrival.arrivalTime = _arrivalTime;
-    arrival.serviceStartTime = _serviceStartTime;
-    arrival.serviceTimeLength = _serviceTimeLength;
-    arrival.serviceEndTime = _serviceStartTime + _serviceTimeLength;
-    arrival.waitTime = _serviceStartTime - _arrivalTime;
+    arrival.type = _type;
+    arrival.eventStartTime = _eventStartTime;
 
     return arrival;
 }
@@ -53,7 +63,7 @@ function littlesLaw(lambda, mu)
 function simulate()
 {
     chartLabels = [];
-    chartsValues = [[],[]];
+    chartsValues = [[],[],[],[]];
     var parameters = document.forms[0];
 
     var lambda = Number(document.getElementById("lambda").value);
@@ -69,6 +79,16 @@ function simulate()
     {
         for(;mu <= 10.0; mu += 0.5) runQueue(lambda,mu,false);
     }
+}
+
+function confidenceInterval(standardDeviation,sampleMean,sampleSize)
+{
+    var interval = {lowEndPoint:0,highEndPoint: 0};
+
+    interval.lowEndPoint = sampleMean - 1.96*(standardDeviation/Math.sqrt(sampleSize));
+    interval.highEndPoint = sampleMean + 1.96*(standardDeviation/Math.sqrt(sampleSize));
+
+    return interval;
 }
 
 function runQueue()
@@ -105,121 +125,76 @@ function runQueue()
 
     /*var p = Number(document.getElementById("p").value);
     * */
-    var simulationTime = Number(document.getElementById("time").value);
+    var simulationTotalTime = Number(document.getElementById("time").value);
 
     var randomNumbersGenerator = new Random();
 
-    var currentTime = 0;
+    var simulationTime = 0;
 
-    var simulationQueue = new queue();
-    var currentPersonsOnQueue = new Array();
+    var simulationQueue = new Queue();
+    var currentPersonsOnQueue = [];
+    var personsCounter = 0;
+    var personsServed = 0;
 
-    var arrivalTime = 0;
-    var serviceStartTime = 0;
-    var serviceTimeLength = 0;
+    var arrivalTime;
+    var serviceEndTime = simulationTotalTime;
+    var lastEventTime = 0;
+    var areaUnderPersonsChart = 0;
 
-    while(currentTime < simulationTime)
+    arrivalTime = randomNumbersGenerator.exponential(lambda);
+    simulationQueue.push(new QueueArrival("Arrival",arrivalTime));
+
+    while(simulationTime <= simulationTotalTime && !simulationQueue.emptyQueue())
     {
-        if (simulationQueue.numberOfPersonsOnQueue() === 0)
+        var event = simulationQueue.pop();
+
+        if(event.type === "Arrival")
         {
-            if(distribution === "Uniforme")
-            {
-                arrivalTime = randomNumbersGenerator.uniform(uniformLow,uniformHigh)
-            }
+            simulationTime = arrivalTime;
+            areaUnderPersonsChart += personsCounter*(simulationTime - lastEventTime);
+            personsCounter++;
+            lastEventTime = simulationTime;
+            arrivalTime = simulationTime + randomNumbersGenerator.exponential(lambda);
+            simulationQueue.push(new QueueArrival("Arrival",arrivalTime));
 
-            else if(distribution === "Exponencial")
+            if(personsCounter === 1)
             {
-                arrivalTime = randomNumbersGenerator.exponential(lambda);
+                serviceEndTime = simulationTime + randomNumbersGenerator.exponential(mu);
+                simulationQueue.push(new QueueArrival("Departure",serviceEndTime));
             }
-
-            else if(distribution === "Determinístico")
-            {
-                arrivalTime = lambda;
-            }
-
-            serviceStartTime = arrivalTime;
-            currentPersonsOnQueue.push(1);
         }
-        else
+        else if(event.type === "Departure")
         {
-            if(distribution === "Uniforme")
-            {
-                arrivalTime += randomNumbersGenerator.uniform(uniformLow,uniformHigh)
-            }
+            simulationTime = serviceEndTime;
+            areaUnderPersonsChart += personsCounter*(simulationTime - lastEventTime);
+            personsCounter--;
+            lastEventTime = simulationTime;
+            personsServed++;
 
-            else if(distribution === "Exponencial")
+            if(personsCounter > 0)
             {
-                arrivalTime += randomNumbersGenerator.exponential(lambda);
+                serviceEndTime = simulationTime + randomNumbersGenerator.exponential(mu);
+                simulationQueue.push(new QueueArrival("Departure",serviceEndTime));
             }
-
-            else if(distribution === "Determinístico")
-            {
-                arrivalTime += lambda;
-            }
-            serviceStartTime=Math.max(arrivalTime,simulationQueue.last().serviceEndTime);
-
-            var totalPersonsOnQueue = simulationQueue.personsOnQueue();
-            var personsSoFar = 1;
-            for(var i = 0; i < totalPersonsOnQueue.length; i++)
-            {
-                if(totalPersonsOnQueue[i].serviceEndTime > arrivalTime) personsSoFar++;
-            }
-
-            currentPersonsOnQueue.push(personsSoFar);
         }
-
-        serviceTimeLength = randomNumbersGenerator.exponential(mu);
-
-        simulationQueue.push(queueArrival(arrivalTime,serviceStartTime,serviceTimeLength));
-
-        currentTime = arrivalTime;
+        if(personsCounter > 0)currentPersonsOnQueue.push(personsCounter);
+        //document.getElementById("debug").innerHTML += ", "+(simulationTime);
     }
 
-    var waitTimes = new Array();
-    var serviceTimes = new Array();
-    var timesOnSystem = new Array();
-
-    var personsOnQueue = simulationQueue.personsOnQueue();
-
-    for(var i = 0; i < personsOnQueue.length; i++)
-    {
-        waitTimes.push(personsOnQueue[i].waitTime);
-        serviceTimes.push(personsOnQueue[i].serviceTimeLength);
-        timesOnSystem.push(personsOnQueue[i].waitTime + personsOnQueue[i].serviceTimeLength);
-    }
-
-    var meanWait = 0;
-    for(var i = 0; i < waitTimes.length; i++)
-    {
-        meanWait += (waitTimes[i]/waitTimes.length);
-    }
-
-    var meanTimeOnSystem = 0;
-    for(var i = 0; i < timesOnSystem.length; i++)
-    {
-        meanTimeOnSystem += timesOnSystem[i]/timesOnSystem.length;
-    }
-
-    var meanServiceTime = 0;
-    for(var i = 0; i < serviceTimes.length; i++)
-    {
-        meanServiceTime += serviceTimes[i]/serviceTimes.length;
-    }
-
-    var meanPersonsOnSystem = 0;
-    for(var i = 0; i < currentPersonsOnQueue.length; i++)
-    {
-        meanPersonsOnSystem += currentPersonsOnQueue[i]/currentPersonsOnQueue.length;
-    }
+    var meanPersonsOnSystem = areaUnderPersonsChart/simulationTime;
 
     var utilisation = lambda/mu;
 
-    var result = "Total de pessoas na fila: "+ simulationQueue.numberOfPersonsOnQueue() + "<br>";
-    result += "Tempo m&eacute;dio de na fila: "+ meanServiceTime + "<br>";
-    result += "Numero m&eacutedio de pessoas na fila"+ meanPersonsOnSystem + "<br>";
-    result += "Tempo m&eacute;dio de espera: "+ meanWait + "<br>";
-    result += "Tempo m&eacute;dio no sistema: "+ meanTimeOnSystem + "<br>";
-    result += "Utilisa&ccedil;&atilde;o : "+ utilisation + "<br>";
+    var personsOnSystemVariance = 0;
+
+    for(var i = 0; i < currentPersonsOnQueue.length; i++)
+    {
+        personsOnSystemVariance += Math.pow(currentPersonsOnQueue[i]-meanPersonsOnSystem,2)/currentPersonsOnQueue.length;
+    }
+
+    var personsOnSystemStardadDeviation = Math.sqrt(personsOnSystemVariance);
+
+    var confidenceIntervalEndPoints = confidenceInterval(personsOnSystemStardadDeviation,meanPersonsOnSystem,currentPersonsOnQueue.length);
 
     chartsValues[0].push(meanPersonsOnSystem);
     if(distribution === "Uniforme")
@@ -237,6 +212,9 @@ function runQueue()
         chartsValues[1].push(lambda);
     }
 
-    addResultTable(lambda,mu,simulationQueue.numberOfPersonsOnQueue(),meanServiceTime,meanPersonsOnSystem,meanWait,meanTimeOnSystem,utilisation);
+    chartsValues[2].push(confidenceIntervalEndPoints.lowEndPoint);
+    chartsValues[3].push(confidenceIntervalEndPoints.highEndPoint);
+
+    //addResultTable(lambda,mu,simulationQueue.numberOfPersonsOnQueue(),meanServiceTime,meanPersonsOnSystem,meanWait,meanTimeOnSystem,utilisation,personsOnSystemStardadDeviation);
     addChart(chartLabels,chartsValues,chartXLabel);
 }
