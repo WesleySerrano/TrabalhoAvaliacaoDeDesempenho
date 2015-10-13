@@ -22,28 +22,13 @@ function Queue()
         return served;
     };
 
-    this.last = function()
-    {
-        return this.array[this.array.length-1];
-    };
-
-    this.numberOfPersonsOnQueue = function()
-    {
-        return this.array.length;
-    };
-
-    this.personsOnQueue = function()
-    {
-        return this.array;
-    };
-
     this.emptyQueue = function()
     {
         return (this.array.length === 0);
     }
 }
 
-function QueueArrival(_type,_eventStartTime)
+function addEventToQueue(_type,_eventStartTime)
 {
     var arrival = {type:"", eventStartTime:0};
 
@@ -128,74 +113,84 @@ function runQueue()
     }
 
     var simulationTotalTime = Number(document.getElementById("time").value);
+    var simulationTotalRounds = Number(document.getElementById("rounds").value);
 
     var randomNumbersGenerator = new Random();
 
-    var simulationTime = 0;
+    var roundsCounter = 1;
 
-    var simulationQueue = new Queue();
-    var currentPersonsOnQueue = [];
-    var personsCounter = 0;
-    var personsServed = 0;
+    var meanPersonsOnSystem = 0;
+    var meanPersonsPerRound = [];
 
-    var arrivalTime;
-    var serviceEndTime = simulationTotalTime;
-    var lastEventTime = 0;
-    var areaUnderPersonsChart = 0;
-
-    arrivalTime = randomNumbersGenerator.exponential(lambda);
-    simulationQueue.push(new QueueArrival("Arrival",arrivalTime));
-
-    while(simulationTime <= simulationTotalTime && !simulationQueue.emptyQueue())
+    for(; roundsCounter <= simulationTotalRounds; roundsCounter++)
     {
-        var event = simulationQueue.pop();
+        var simulationTime = 0;
+        var simulationQueue = new Queue();
+        var personsCounter = 0;
+        var personsServed = 0;
 
-        if(event.type === "Arrival")
+        var arrivalTime = randomNumbersGenerator.exponential(lambda);;
+        var serviceEndTime = simulationTotalTime;
+        var lastEventTime = 0;
+        var areaUnderPersonsChart = 0;
+
+        arrivalTime = randomNumbersGenerator.exponential(lambda);
+        simulationQueue.push(new addEventToQueue("Arrival",arrivalTime));
+
+        while (simulationTime <= simulationTotalTime && !simulationQueue.emptyQueue())
         {
-            simulationTime = arrivalTime;
-            areaUnderPersonsChart += personsCounter*(simulationTime - lastEventTime);
-            personsCounter++;
-            lastEventTime = simulationTime;
-            arrivalTime = simulationTime + randomNumbersGenerator.exponential(lambda);
-            simulationQueue.push(new QueueArrival("Arrival",arrivalTime));
+            var event = simulationQueue.pop();
 
-            if(personsCounter === 1)
+            if (event.type === "Arrival")
             {
-                serviceEndTime = simulationTime + randomNumbersGenerator.exponential(mu);
-                simulationQueue.push(new QueueArrival("Departure",serviceEndTime));
+                simulationTime = arrivalTime;
+                areaUnderPersonsChart += personsCounter * (simulationTime - lastEventTime);
+                personsCounter++;
+                lastEventTime = simulationTime;
+                arrivalTime = simulationTime + randomNumbersGenerator.exponential(lambda);
+                simulationQueue.push(new addEventToQueue("Arrival", arrivalTime));
+
+                if (personsCounter === 1)
+                {
+                    serviceEndTime = simulationTime + randomNumbersGenerator.exponential(mu);
+                    simulationQueue.push(new addEventToQueue("Departure", serviceEndTime));
+                }
+            }
+            else if (event.type === "Departure")
+            {
+                simulationTime = serviceEndTime;
+                areaUnderPersonsChart += personsCounter * (simulationTime - lastEventTime);
+                personsCounter--;
+                lastEventTime = simulationTime;
+                personsServed++;
+
+                if (personsCounter > 0)
+                {
+                    serviceEndTime = simulationTime + randomNumbersGenerator.exponential(mu);
+                    simulationQueue.push(new addEventToQueue("Departure", serviceEndTime));
+                }
             }
         }
-        else if(event.type === "Departure")
-        {
-            simulationTime = serviceEndTime;
-            areaUnderPersonsChart += personsCounter*(simulationTime - lastEventTime);
-            personsCounter--;
-            lastEventTime = simulationTime;
-            personsServed++;
 
-            if(personsCounter > 0)
-            {
-                serviceEndTime = simulationTime + randomNumbersGenerator.exponential(mu);
-                simulationQueue.push(new QueueArrival("Departure",serviceEndTime));
-            }
-        }
-        if(personsCounter > 0)currentPersonsOnQueue.push(personsCounter);
+        meanPersonsPerRound.push(areaUnderPersonsChart/simulationTotalTime);
     }
 
-    var meanPersonsOnSystem = areaUnderPersonsChart/simulationTime;
-
+    for(var i = 0; i < meanPersonsPerRound.length; i++)
+    {
+        meanPersonsOnSystem += (meanPersonsPerRound[i])/simulationTotalRounds;
+    }
     var analyticUtilisation = lambda/mu;
 
     var personsOnSystemVariance = 0;
 
-    for(var i = 0; i < currentPersonsOnQueue.length; i++)
+    for(var i = 0; i < meanPersonsPerRound.length; i++)
     {
-        personsOnSystemVariance += Math.pow(currentPersonsOnQueue[i]-meanPersonsOnSystem,2)/(currentPersonsOnQueue.length-1);
+        personsOnSystemVariance += Math.pow(meanPersonsPerRound[i]-meanPersonsOnSystem,2)/Math.max(meanPersonsPerRound.length-1,1);
     }
 
     var personsOnSystemStandardDeviation = Math.sqrt(personsOnSystemVariance);
 
-    var confidenceIntervalEndPoints = confidenceInterval(personsOnSystemStandardDeviation,meanPersonsOnSystem,currentPersonsOnQueue.length);
+    var confidenceIntervalEndPoints = confidenceInterval(personsOnSystemStandardDeviation,meanPersonsOnSystem,meanPersonsPerRound.length);
 
     var analyticMeanPersonsOnSystem = littlesLaw(lambda,mu);
 
